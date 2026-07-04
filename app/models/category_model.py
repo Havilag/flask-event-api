@@ -1,0 +1,12 @@
+from db import db
+from sqlalchemy import Integer, String, Text, DECIMAL, Boolean, ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+class Category(db.Model):
+    __tablename__ = 'categories'
+    
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, unique=True)
+    name: Mapped[str] = mapped_column(String(150), nullable=False, unique=True)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    
+    
