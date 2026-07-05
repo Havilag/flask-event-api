@@ -12,3 +12,15 @@ class User(db.Model):
     password: Mapped[str] = mapped_column(String(255), nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     role_id: Mapped[int] = mapped_column(Integer, ForeignKey('roles.id'), nullable=False)
+    
+    
+    def to_json(self):
+        return {
+        "id": self.id,
+        "name": self.name,
+        'last_name': self.last_name,
+        "email": self.email,
+        'password': self.password,
+        "is_active": self.is_active,
+        "role_id": self.role_id
+    }
