@@ -15,18 +15,18 @@ class BookingService:
         
         return booking
     
-    def create(self, data: BookingSchema) -> Booking:
+    def create(self, user_id: int, event_id: int, ticket_quantity: int, booking_date: str, total_amount: float, status: str) -> Booking:
         booking = Booking (
-            booking_date = data.booking_date,
-            ticket_quantity = data.ticket_quantity,
-            total_amount = data.total_amount,
-            status = data.status,
-            user_id = data.user_id,
-            event_id = data.event_id
+            booking_date = booking_date,
+            ticket_quantity = ticket_quantity,
+            total_amount = total_amount,
+            status = status,
+            user_id = user_id,
+            event_id =event_id
         )
         
         db.session.add(booking)
-        db.session.commit()
+        
         
         return booking
     
@@ -38,11 +38,11 @@ class BookingService:
         booking.user_id = data.user_id
         booking.event_id = data.event_id
         
-        db.session.commit()
+        
         return booking
     
     def delete(self, booking:Booking) -> None:
         booking.status = 'cancelled'
-        db.session.commit()
+        
 
 booking_service = BookingService()

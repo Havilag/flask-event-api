@@ -16,3 +16,18 @@ class Event(db.Model):
     available_tickets: Mapped[int] = mapped_column(Integer, nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     category_id: Mapped[int] = mapped_column(Integer, ForeignKey('categories.id'), nullable=False)
+    
+    
+    def to_json(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'description': self.description,
+            'date': str(self.date),
+            'location':  self.location,
+            'price': float(self.price),
+            'max_capacity': self.max_capacity,
+            'available_tickets': self.available_tickets,
+            'is_active': self.is_active,
+            'category_id': self.category_id
+            }

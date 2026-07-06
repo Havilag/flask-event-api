@@ -16,6 +16,13 @@ class UserService:
         ).first()
         
         return user
+    
+    
+    
+    def get_by_username(self, username: str) -> User | None:
+        return User.query.filter_by(username=username).first()
+    
+    
         
     def create(self, data: UserSchema ) -> User:
         created_user = User(

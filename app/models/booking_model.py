@@ -14,3 +14,17 @@ class Booking(db.Model):
     status: Mapped[str] = mapped_column(String(50), default='PENDING')
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'), nullable=False)
     event_id: Mapped[int] = mapped_column(Integer, ForeignKey('events.id'), nullable=False)
+    
+    
+    def to_json(self):
+        return{
+            'id': self.id,
+            'booking_date': str(self.booking_date),
+            'ticket_quantity': self.ticket_quantity,
+            'total_amount': float(self.total_amount),
+            'status': self.status,
+            'user_id': self.user_id,
+            'event_id': self.event_id
+        }
+    
+    

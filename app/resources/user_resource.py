@@ -4,14 +4,13 @@ from app.schemas.user_schema import UserSchema
 from app.services.user_service import user_service
 from flask import request
 from pydantic import ValidationError
-from db import db
 
 
 class UserResource(Resource):
     
     def get(self):
         try:
-            users: list[User] = User.query.all()
+            users = user_service.get_all()
             
             users_list = [user.to_json() for user in users]
              

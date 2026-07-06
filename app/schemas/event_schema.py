@@ -6,8 +6,8 @@ class EventSchema(BaseModel):
     description: str
     date: datetime
     location: str
-    price: int
+    price: float
     max_capacity: int
     available_tickets: int
-    is_active: bool
+    is_active: bool = True
     category_id: int

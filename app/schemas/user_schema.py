@@ -6,5 +6,5 @@ class UserSchema(BaseModel):
     last_name: str
     email: EmailStr
     password: str
-    is_active: bool
+    is_active: bool = True
     role_id: int
