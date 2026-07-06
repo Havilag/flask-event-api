@@ -1,7 +1,7 @@
 from app.models.user_model import User
 from app.schemas.user_schema import UserSchema
 from db import db
-
+from app.utils.security import hash_password
 
 class UserService:
     
@@ -17,7 +17,8 @@ class UserService:
         
         return user
     
-    
+    def find_by_email(self, email: str) -> User | None:
+        return User.query.filter_by(email=email).first()
     
     def get_by_username(self, username: str) -> User | None:
         return User.query.filter_by(username=username).first()
@@ -29,7 +30,7 @@ class UserService:
             name = data.name,
             last_name = data.last_name,
             email = data.email,
-            password = data.password,
+            password = hash_password(data.password),
             is_active=True,
             role_id = data.role_id,
         )
@@ -43,7 +44,7 @@ class UserService:
         user.name=data.name
         user.last_name = data.last_name
         user.email = data.email
-        user.password = data.password
+        user.password = hash_password(data.password)
         
         return user
 

@@ -1,0 +1,176 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "API de Gestión de Eventos y Reservas",
+    "description": "Documentación interactiva de la REST API para el control de eventos, usuarios, roles y reservas de tickets.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000/api/v1",
+      "description": "Servidor Local"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Ingresa tu token JWT generado en el Login. Formato: Justo el token (sin la palabra Bearer)."
+      }
+    }
+  },
+  "paths": {
+    "/register": {
+      "post": {
+        "summary": "Registrar un nuevo usuario (Público)",
+        "description": "Crea una cuenta nueva con el rol básico de cliente (Público General, roles_id = 3).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name", "last_name", "email", "password"],
+                "properties": {
+                  "name": { "type": "string", "example": "Juan" },
+                  "last_name": { "type": "string", "example": "Pérez" },
+                  "email": { "type": "string", "example": "juan@example.com" },
+                  "password": { "type": "string", "example": "password123" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Usuario registrado exitosamente." },
+          "400": { "description": "Datos de entrada inválidos o correo ya registrado." }
+        }
+      }
+    },
+    "/login": {
+      "post": {
+        "summary": "Iniciar Sesión",
+        "description": "Autentica las credenciales del usuario y retorna un Access Token JWT con sus claims y roles.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": { "type": "string", "example": "juan@example.com" },
+                  "password": { "type": "string", "example": "password123" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Autenticación exitosa.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "access_token": { "type": "string", "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Credenciales incorrectas." }
+        }
+      }
+    },
+    "/users": {
+      "get": {
+        "summary": "Listar todos los usuarios",
+        "description": "Retorna una lista con todos los usuarios del sistema. Ruta protegida.",
+        "security": [{ "BearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Lista de usuarios obtenida correctamente." },
+          "401": { "description": "Token inválido o ausente." },
+          "403": { "description": "Permisos insuficientes (Requiere rol Admin o Personal)." }
+        }
+      },
+      "post": {
+        "summary": "Crear un usuario con Rol específico",
+        "description": "Permite a un Administrador crear directamente cuentas asignando cualquier tipo de rol.",
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name", "last_name", "email", "password", "roles_id"],
+                "properties": {
+                  "name": { "type": "string", "example": "Carlos" },
+                  "last_name": { "type": "string", "example": "Gómez" },
+                  "email": { "type": "string", "example": "carlos@admin.com" },
+                  "password": { "type": "string", "example": "admin456" },
+                  "roles_id": { "type": "integer", "example": 1 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Usuario administrativo creado con éxito." },
+          "403": { "description": "Acceso denegado (Solo administradores)." }
+        }
+      }
+    },
+    "/bookings": {
+      "post": {
+        "summary": "Crear una nueva reserva",
+        "description": "Lógica de negocio: Valida el stock actual disponible de tickets del evento, genera la reserva y descuenta la cantidad solicitada automáticamente.",
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["event_id", "ticket_quantity"],
+                "properties": {
+                  "event_id": { "type": "integer", "example": 5 },
+                  "ticket_quantity": { "type": "integer", "example": 2 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Reserva confirmada y stock actualizado." },
+          "400": { "description": "Stock insuficiente para completar la reserva o ID inválido." },
+          "401": { "description": "No autorizado." }
+        }
+      }
+    },
+    "/bookings/{booking_id}": {
+      "delete": {
+        "summary": "Cancelar una reserva",
+        "description": "Lógica de negocio: Realiza la cancelación lógica de la reserva y devuelve de forma automática los tickets al stock disponible del evento asociado.",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "booking_id",
+            "in": "path",
+            "required": true,
+            "description": "ID de la reserva a cancelar",
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Reserva cancelada con éxito y stock devuelto al evento." },
+          "404": { "description": "La reserva especificada no existe." }
+        }
+      }
+    }
+  }
+}

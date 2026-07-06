@@ -26,4 +26,5 @@ api.add_resource(ManageEventResource, '/events/<int:event_id>')
 api.add_resource(BookingResource, '/bookings')
 api.add_resource(ManageBookingResource, '/bookings/<int:booking_id>')
 
-api.add_resource(LoginResource, '/api/v1/auth/login')
+api.add_resource(LoginResource, '/login')
+api.add_resource(RegisterResource, '/register')

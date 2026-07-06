@@ -4,10 +4,14 @@ from app.schemas.user_schema import UserSchema
 from app.services.user_service import user_service
 from flask import request
 from pydantic import ValidationError
-
+from flask_jwt_extended import jwt_required
+from app.utils.security import hash_password
+from app.utils.security import roles_required
 
 class UserResource(Resource):
     
+    @jwt_required()
+    @roles_required(1, 2)
     def get(self):
         try:
             users = user_service.get_all()
@@ -22,10 +26,17 @@ class UserResource(Resource):
             }, 400
     
     
+    @jwt_required()
+    @roles_required(1)
     def post(self):
         try:
             data = request.get_json()
             validate_data = UserSchema.model_validate(data)
+            
+            if user_service.find_by_email(validate_data.email):
+                return{
+                    'error': 'Email already exists'
+                }, 400
             
             create_user = user_service.create(validate_data)
             
@@ -43,6 +54,7 @@ class UserResource(Resource):
 
 class ManageUserResource(Resource):
     
+    @jwt_required()
     def get(self, user_id: int):
         
         try:
@@ -61,6 +73,7 @@ class ManageUserResource(Resource):
                 'error': str(e)
             }, 400
     
+    @jwt_required()
     def put(self,  user_id: int):
         
         try:
@@ -88,7 +101,8 @@ class ManageUserResource(Resource):
                 'error': str(e)
             }, 400
         
-    
+        
+    @jwt_required()
     def delete(self, user_id: int):
         try:
             user = user_service.get_by_id(user_id)

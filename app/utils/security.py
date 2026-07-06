@@ -1,9 +1,11 @@
 import bcrypt
 from cryptography.fernet import Fernet
-from flask import current_app
 import os
 from typing import Union
 import base64
+from functools import wraps
+from flask_jwt_extended import get_jwt
+from flask import jsonify
 
 def hash_password(password: str) -> str:
     bytes_pwd = password.encode('utf-8')
@@ -15,6 +17,23 @@ def verify_password(hashed_password: str, password: str) -> bool:
     bytes_hashed_pwd = hashed_password.encode('utf-8')
     bytes_pwd = password.encode('utf-8')
     return bcrypt.checkpw(bytes_pwd, bytes_hashed_pwd)
+
+def roles_required(*allowed_roles: int):
+
+        def decorator(fn):
+            @wraps(fn)
+            def wrapper(*args, **kwargs):
+                claims = get_jwt()
+                user_role = claims.get('role_id')
+
+                if user_role not in allowed_roles:
+                    return {
+                        'error': 'Forbidden: You do not have permission to access this resource'
+                    }, 403 
+                
+                return fn(*args, **kwargs)
+            return wrapper
+        return decorator
 
 
 class Crypto:
@@ -49,3 +68,6 @@ class Crypto:
                         
         except ValueError as e:
             raise ValueError(f'Invalid key: {e}')
+    
+    
+    

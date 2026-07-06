@@ -1,0 +1,152 @@
+# 📅 API de Gestión de Eventos y Reservas
+
+¡Bienvenido! Esta es una **REST API** robusta y escalable desarrollada con **Flask** para la gestión y reserva de entradas a eventos. El sistema cuenta con arquitectura limpia, control de acceso basado en roles (RBAC), persistencia de datos en una base de datos relacional y validaciones de datos en capas de entrada.
+
+---
+
+## 🚀 Características Principales
+
+* **Framework Flask:** Uso de `Flask-RESTful` para una organización limpia de recursos y endpoints.
+* **Base de Datos PostgreSQL:** Persistencia de datos relacional gestionada a través de **SQLAlchemy ORM**.
+* **Autenticación y Autorización Avanzada:** * Protección de rutas con tokens **JWT (JSON Web Tokens)** mediante `Flask-JWT-Extended`.
+    * Control de acceso personalizado por roles (`@roles_required`) para restringir recursos según el tipo de usuario.
+* **Seguridad de Datos:** Contraseñas hasheadas en base de datos con **Bcrypt** y encriptación simétrica con **Fernet**.
+* **Lógica de Negocio Avanzada:** Control automático de stock de entradas en tiempo real durante los flujos de creación (`POST`) y cancelación/devolución (`DELETE`) de reservas.
+* **Validaciones Con Pydantic:** Sanitización y validación estricta de esquemas JSON entrantes.
+* **Documentación Interactiva:** Interfaz gráfica integrada con **Swagger UI**.
+
+---
+
+## 🛠️ Tecnologías y Librerías Utilizadas
+
+* **Python 3.x**
+* **Flask** & **Flask-RESTful**
+* **Flask-SQLAlchemy** (ORM) & **psycopg2-binary** (Driver PostgreSQL)
+* **Flask-JWT-Extended** (Autenticación)
+* **Bcrypt** & **Cryptography (Fernet)** (Seguridad)
+* **Pydantic** (Validación de esquemas)
+* **Flask-Swagger-UI** (Documentación)
+
+---
+
+---
+
+## 📁 Estructura del Proyecto
+
+El proyecto sigue una arquitectura limpia orientada al dominio y segmentada rigurosamente por responsabilidades:
+
+```text
+MODULO02/
+│
+├── app/
+│   ├── __init__.py          # Inicialización de Flask, extensiones, JWT y Swagger
+│   ├── router.py            # Centralización y registro de rutas de la API
+│   │
+│   ├── models/              # Capa de Persistencia (Modelos SQLAlchemy)
+│   │   ├── booking_model.py
+│   │   ├── category_model.py
+│   │   ├── event_model.py
+│   │   ├── role_model.py
+│   │   └── user_model.py
+│   │
+│   ├── resources/           # Capa de Controladores (Endpoints Flask-RESTful)
+│   │   ├── auth_resource.py
+│   │   ├── booking_resource.py
+│   │   ├── category_resource.py
+│   │   ├── event_resource.py
+│   │   ├── role_resource.py
+│   │   └── user_resource.py
+│   │
+│   ├── schemas/             # Capa de Validación (Esquemas Pydantic v2)
+│   │   ├── auth_schema.py
+│   │   ├── booking_schema.py
+│   │   ├── category_schema.py
+│   │   ├── event_schema.py
+│   │   ├── role_schema.py
+│   │   └── user_schema.py
+│   │
+│   ├── services/            # Capa de Lógica de Negocio (Core Operativo)
+│   │   ├── booking_service.py
+│   │   ├── category_service.py
+│   │   ├── event_service.py
+│   │   ├── role_service.py
+│   │   └── user_service.py
+│   │
+│   ├── static/              # Archivos estáticos de configuración externa
+│   │   └── swagger.json     # Documentación estructurada de OpenAPI
+│   │
+│   └── utils/               # Utilidades globales del sistema
+│       └── security.py      # Lógica de cifrado (Fernet y hashing Bcrypt)
+│
+├── entorno_virtual/         # Entorno virtual de dependencias aislado
+├── migrations/              # Historial de migraciones de base de datos (Flask-Migrate)
+├── .env                     # Variables de configuración y secretos locales
+├── config.py                # Carga y mapeo de variables de entorno de Flask
+├── db.py                    # Instancia global y compartida de SQLAlchemy
+├── Diagram.png              # Diagrama Entidad-Relación (DER) del sistema
+├── key_generator.py         # Script utilitario para generar llaves criptográficas
+├── README.md                # Manual técnico del proyecto
+├── requirements.txt         # Listado de dependencias del proyecto
+└── run.py                   # Script de inicio principal de la aplicación
+
+## 📐 Modelo de Base de Datos (DER)
+
+El sistema utiliza un diseño relacional optimizado para garantizar la integridad de los datos entre usuarios, roles, eventos, categorías y reservas. A continuación se presenta el diagrama entidad-relación del sistema:
+
+![Diagrama de Base de Datos](./Diagram.png)
+
+
+---
+
+## 🔐 Roles del Sistema
+
+El sistema maneja un Control de Acceso Basado en Roles (RBAC) estructurado bajo los siguientes identificadores numéricos, los cuales están vinculados directamente a la columna `roles_id` de la tabla `users`:
+
+* **`1` (Administrador):** Posee acceso total al sistema. Puede visualizar de forma global todos los registros y tiene permisos exclusivos para la creación de personal o usuarios administrativos.
+* **`2` (Personal / Trabajador):** Cuenta con permisos de lectura de registros y gestión interna operativa para el control de los eventos cotidianos.
+* **`3` (Público General):** Permisos básicos del lado del cliente. Permite a los usuarios registrarse de forma autónoma, iniciar sesión y gestionar sus propias reservas de eventos.
+
+---
+---
+
+## 🛣️ Endpoints Principales
+
+| Módulo | Endpoint | Método | Protección | Descripción |
+| :--- | :--- | :--- | :--- | :--- |
+| **Autenticación** | `/api/v1/register` | `POST` | Público | Registra un usuario con rol inicial Público (`3`). |
+| | `/api/v1/login` | `POST` | Público | Autentica credenciales y retorna un `access_token` cargado con claims de identidad y roles. |
+| **Usuarios** | `/api/v1/users` | `GET` | `@jwt_required`, `@roles_required(1, 2)` | Lista todos los usuarios registrados en el sistema. |
+| | `/api/v1/users` | `POST` | `@jwt_required`, `@roles_required(1)` | Creación directa de usuarios de cualquier rol (ej: nuevos administradores). |
+| | `/api/v1/users/<int:user_id>` | `GET` / `PUT` / `DELETE` | `@jwt_required` | Gestión individual CRUD de un usuario específico por su ID. |
+| **Reservas** | `/api/v1/bookings` | `POST` | `@jwt_required` | **Lógica de negocio:** Valida stock actual del evento, genera la reserva y descuenta cupos automáticamente. |
+| | `/api/v1/bookings/<int:booking_id>` | `DELETE` | `@jwt_required` | **Lógica de negocio:** Cancela la reserva lógicamente (`status = 'cancelled'`) y devuelve los tickets al stock del evento. |
+
+
+## 📦 Instalación y Configuración Local
+
+Sigue estos pasos para levantar el entorno de desarrollo local:
+
+### Clonar el repositorio
+```bash
+git clone [https://github.com/tu-usuario/tu-repositorio.git](https://github.com/tu-usuario/tu-repositorio.git)
+cd tu-repositorio
+
+# En Windows:
+python -m venv venv
+.\venv\Scripts\activate
+
+# En Linux/Mac:
+python3 -m venv venv
+source venv/bin/activate
+
+pip install -r requirements.txt
+
+
+FLASK_APP=app.py
+FLASK_ENV=development
+DATABASE_URL=postgresql://postgres:tu_contraseña@localhost:5432/tu_base_de_datos
+JWT_SECRET_KEY=tu_clave_secreta_jwt_super_segura
+FERNET_SECRET_KEY=tu_clave_fernet_generada_en_base64_de_32_bytes
+
+python app.py
+
