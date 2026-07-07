@@ -209,9 +209,6 @@ pip install -r requirements.txt
 Crear un archivo `.env` en la raíz del proyecto:
 
 ```env
-FLASK_APP=app.py
-FLASK_ENV=development
-
 DATABASE_URL=postgresql://postgres:tu_contraseña@localhost:5432/tu_base_de_datos
 
 JWT_SECRET_KEY=tu_clave_secreta_jwt_super_segura
@@ -274,7 +271,7 @@ Desde Swagger podrás:
 
 ---
 
-## 👨‍💻 Autor
+## 👨‍💻 Autor: Hector Avila Gonzales
 
 Proyecto desarrollado como práctica de Backend con:
 
