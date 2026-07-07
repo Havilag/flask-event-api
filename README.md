@@ -1,6 +1,6 @@
 # 📅 API de Gestión de Eventos y Reservas
 
-¡Bienvenido! Esta es una **REST API** robusta y escalable desarrollada con **Flask** para la gestión y reserva de entradas a eventos. El sistema cuenta con arquitectura limpia, control de acceso basado en roles (RBAC), persistencia de datos en una base de datos relacional y validaciones de datos en capas de entrada.
+Repositorio para la gestión y reserva de entradas a eventos.
 
 ---
 
