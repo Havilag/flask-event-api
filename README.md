@@ -1,29 +1,24 @@
-# 📅 API de Gestión de Eventos y Reservas
+# API de Gestión de Eventos y Reservas
 
-Repositorio para la gestión y reserva de entradas a eventos.
-
----
-
-## 🚀 Características Principales
-
-- **Framework Flask:** Uso de `Flask-RESTful` para una organización limpia de recursos y endpoints.
-- **Base de Datos PostgreSQL:** Persistencia de datos relacional gestionada mediante **SQLAlchemy ORM**.
-- **Autenticación y Autorización Avanzada:**
-  - Protección de rutas con tokens **JWT (JSON Web Tokens)** mediante `Flask-JWT-Extended`.
-  - Control de acceso personalizado por roles (`@roles_required`) para restringir recursos según el tipo de usuario.
-- **Seguridad de Datos:**
-  - Contraseñas hasheadas utilizando **Bcrypt**.
-  - Encriptación simétrica mediante **Fernet**.
-- **Lógica de Negocio Avanzada:**
-  - Control automático de stock de entradas durante la creación y cancelación de reservas.
-- **Validaciones con Pydantic:**
-  - Validación y sanitización estricta de datos JSON entrantes.
-- **Documentación Interactiva:**
-  - Integración de **Swagger UI** para pruebas y exploración de endpoints.
+Este proyecto consiste en una API REST para la gestión de eventos y reservas de entradas.
 
 ---
 
-## 🛠️ Tecnologías y Librerías Utilizadas
+## Características Principales
+
+- Desarrollo de una API REST con Flask.
+- Almacenamiento de la información en PostgreSQL mediante SQLAlchemy.
+- Autenticación de usuarios con JWT.
+- Control de acceso según el rol del usuario.
+- Contraseñas protegidas con Bcrypt.
+- Cifrado de información mediante Fernet.
+- Validación de datos con Pydantic.
+- Actualización automática del stock al crear o cancelar una reserva.
+- Documentación de la API con Swagger UI.
+
+---
+
+## Tecnologías y Librerías Utilizadas
 
 - **Python 3.x**
 - **Flask**
@@ -39,9 +34,7 @@ Repositorio para la gestión y reserva de entradas a eventos.
 
 ---
 
-## 📁 Estructura del Proyecto
-
-El proyecto sigue una arquitectura limpia orientada al dominio y segmentada por responsabilidades.
+## Estructura del Proyecto
 
 ```text
 MODULO02/
@@ -100,9 +93,7 @@ MODULO02/
 
 ---
 
-## 📐 Modelo de Base de Datos (DER)
-
-El sistema utiliza un diseño relacional optimizado para garantizar la integridad de los datos entre usuarios, roles, eventos, categorías y reservas.
+## Modelo de Base de Datos (DER)
 
 ### Diagrama Entidad-Relación
 
@@ -112,28 +103,28 @@ El sistema utiliza un diseño relacional optimizado para garantizar la integrida
 
 ---
 
-## 🔐 Roles del Sistema
+## Roles del Sistema
 
-El sistema implementa un esquema de **Control de Acceso Basado en Roles (RBAC)**.
+El acceso a las funcionalidades del sistema depende del rol asignado a cada usuario.
 
 | ID | Rol | Descripción |
 |----|------|-------------|
 | `1` | Administrador | Acceso total al sistema y gestión completa de usuarios. |
-| `2` | Personal / Trabajador | Gestión operativa y visualización de registros. |
+| `2` | Personal / Trabajador | Puede gestionar eventos y consultar la información del sistema. |
 | `3` | Público General | Registro, autenticación y gestión de sus propias reservas. |
 
 ---
 
-## 🛣️ Endpoints Principales
+## Endpoints Principales
 
-### 🔑 Autenticación
+### Autenticación
 
 | Endpoint | Método | Acceso | Descripción |
 |-----------|---------|---------|-------------|
 | `/api/v1/register` | `POST` | Público | Registra un usuario con rol Público (`3`). |
-| `/api/v1/login` | `POST` | Público | Autentica credenciales y retorna un JWT válido. |
+| `/api/v1/login` | `POST` | Público | Verifica las credenciales del usuario y devuelve un token JWT. |
 
-### 👥 Usuarios
+### Usuarios
 
 | Endpoint | Método | Protección | Descripción |
 |-----------|---------|------------|-------------|
@@ -143,16 +134,16 @@ El sistema implementa un esquema de **Control de Acceso Basado en Roles (RBAC)**
 | `/api/v1/users/<int:user_id>` | `PUT` | `@jwt_required` | Actualiza un usuario existente. |
 | `/api/v1/users/<int:user_id>` | `DELETE` | `@jwt_required` | Elimina un usuario. |
 
-### 🎟️ Reservas
+### Reservas
 
 | Endpoint | Método | Protección | Descripción |
 |-----------|---------|------------|-------------|
-| `/api/v1/bookings` | `POST` | `@jwt_required` | Valida disponibilidad y genera una reserva descontando stock automáticamente. |
+| `/api/v1/bookings` | `POST` | `@jwt_required` | Verifica la disponibilidad de entradas y crea una reserva actualizando el stock del evento. |
 | `/api/v1/bookings/<int:booking_id>` | `DELETE` | `@jwt_required` | Cancela la reserva y devuelve los tickets al stock del evento. |
 
 ---
 
-## 💼 Lógica de Negocio Implementada
+## Lógica de Negocio Implementada
 
 ### Creación de Reservas
 
@@ -173,7 +164,7 @@ Al cancelar una reserva:
 
 ---
 
-## 📦 Instalación y Configuración Local
+## Instalación y Configuración Local
 
 ### 1️⃣ Clonar el repositorio
 
@@ -243,7 +234,7 @@ flask run
 
 ---
 
-## 📚 Documentación Swagger
+## Documentación Swagger
 
 Una vez iniciada la aplicación, la documentación interactiva estará disponible en:
 
@@ -253,25 +244,25 @@ http://localhost:5000/swagger
 
 Desde Swagger podrás:
 
-- Visualizar todos los endpoints.
-- Probar peticiones directamente desde el navegador.
-- Consultar esquemas de entrada y salida.
-- Revisar códigos de respuesta HTTP.
+- Consultar los endpoints disponibles.
+- Probar las peticiones.
+- Ver los parámetros de entrada.
+- Revisar las respuestas de cada endpoint.
 
 ---
 
-## 🔒 Seguridad Implementada
+## Seguridad Implementada
 
 - Autenticación mediante JWT.
-- Protección de rutas sensibles.
-- Control de acceso basado en roles (RBAC).
-- Contraseñas almacenadas con hash Bcrypt.
-- Cifrado de información sensible mediante Fernet.
+- Protección de rutas privadas.
+- Control de acceso según el rol del usuario.
+- Contraseñas almacenadas con Bcrypt.
+- Cifrado de información con Fernet.
 - Validación de datos con Pydantic.
 
 ---
 
-## 👨‍💻 Autor: Hector Avila Gonzales
+## Autor: Hector Avila Gonzales
 
 Proyecto desarrollado como práctica de Backend con:
 
